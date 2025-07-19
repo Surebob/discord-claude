@@ -1,0 +1,22 @@
+# Bun configuration for Discord Claude Bot
+
+[install]
+# Use exact versions for better reproducibility in production
+exact = true
+
+# Cache directory for faster installs
+cache = true
+
+[run]
+# Enable bun shell for better cross-platform compatibility
+shell = "bun"
+
+# Enable hot reload by default in development
+hot = true
+
+[build]
+# Target Node.js environment
+target = "node"
+
+# Enable source maps for debugging
+sourcemap = "external" 
