@@ -1,5 +1,8 @@
 import winston from 'winston';
-import { logLevel, isDevelopment } from '@/config/index.js';
+
+// Define logger configuration directly to avoid circular dependency
+const logLevel = process.env.LOG_LEVEL || 'info';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Custom format for better readability
 const customFormat = winston.format.combine(

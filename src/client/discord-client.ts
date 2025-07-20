@@ -143,7 +143,7 @@ class DiscordClientManager {
         discordClient: this.client,
         currentChannel: message.channel,
         currentMessage: message
-      });
+      }, (msg, attachments, limit) => this.processAttachmentsWithDeduplication(msg, attachments, limit));
 
       // Current message is pure text only - attachments will be handled in context
       const finalPrompt = prompt;
@@ -242,7 +242,7 @@ class DiscordClientManager {
         discordClient: this.client,
         currentChannel: interaction.channel,
         currentMessage: null // Slash commands don't have a specific message
-      });
+      }, (msg, attachments, limit) => this.processAttachmentsWithDeduplication(msg, attachments, limit));
 
       // Start typing indicator immediately
       await interaction.followUp({ content: '⌨️ *Claude is thinking...*' }).then(msg => {
