@@ -8,23 +8,21 @@
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "allowImportingTsExtensions": false,
-    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": false,
     "allowJs": true,
     "checkJs": false,
+    "downlevelIteration": true,
     "types": ["bun-types"],
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/services/*": ["src/services/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": [

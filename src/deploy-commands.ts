@@ -1,6 +1,6 @@
 import { REST, Routes, SlashCommandBuilder } from 'discord.js';
-import { config } from '@/config/index.js';
-import { logger } from '@/utils/logger.js';
+import { config } from './modules/infra/config';
+import { logger } from './modules/infra/logging';
 
 // Define slash commands for user app support
 const commands = [
