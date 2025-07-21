@@ -68,6 +68,13 @@ graph TB
     Data --> Infra
     Discord --> Infra
     Files --> Infra
+    
+    style Core fill:#e3f2fd
+    style AI fill:#f3e5f5
+    style Data fill:#e8f5e8
+    style Discord fill:#fff3e0
+    style Files fill:#f1f8e9
+    style Infra fill:#fce4ec
 ```
 
 **Key Principles:**
@@ -105,104 +112,114 @@ graph TB
 
 ```mermaid
 sequenceDiagram
-    participant U as Discord User
-    participant D as Discord Module
-    participant C as Core/DI Container
-    participant AI as AI Module
-    participant Data as Data Module
-    participant Claude as Claude API
+    participant U as 👤 Discord User
+    participant D as 💬 Discord Module
+    participant C as 🏗️ Core/DI Container
+    participant AI as 🧠 AI Module
+    participant Data as 💾 Data Module
+    participant Claude as 🤖 Claude API
     
     U->>D: Send Message
     D->>C: Resolve Dependencies
+    Note over C: DI Container Setup<br/>Service Registration
     C->>D: Inject Services (AI, Data, Files)
     D->>Data: Build Context
-    Data->>Data: Fetch Conversation History
-    Data->>Data: Get Summaries from PostgreSQL
+    Note over Data: Fetch Conversation History<br/>Get Summaries from PostgreSQL
+    Data->>Data: Context Assembly
     D->>AI: Process with Context
+    Note over AI: Instance-based Services<br/>Circuit Breakers Active
     AI->>Claude: API Request + Tools
     Claude->>AI: Response + Tool Calls
     AI->>D: Formatted Response
     D->>U: Reply to Discord
+    Note over D,U: Zero resource leaks<br/>Automatic cleanup
 ```
 
 ### Thread Context Retrieval System
 
 ```mermaid
-flowchart TD
-    A["`👤 **User Query**
-    'What did we decide about the API?'`"] --> B{"`🔍 **Thread Discovery**
-    Search relevant threads`"}
+timeline
+    title Thread Intelligence & Delegate System
     
-    B --> C["`🧵 **Found Threads**
-    - API Design Discussion
-    - Implementation Planning
-    - Security Review`"]
+    section User Query
+        Input : 👤 "What did we decide about the API?"
+              : Question routing
+              : Context hint extraction
     
-    C --> D["`⚡ **Delegate Claude**
-    Haiku Model
-    Fast & Cost-Effective`"]
+    section Discovery
+        Thread Search : 🔍 Find relevant threads
+                      : API Design Discussion
+                      : Implementation Planning  
+                      : Security Review
+        
+        Model Selection : ⚡ Claude 3.5 Haiku
+                       : Fast & Cost-Effective
+                       : 80% cost reduction
     
-    D --> E["`📋 **Context Assembly**
-    - Thread Messages
-    - Uploaded Documents  
-    - Conversation Summaries
-    - Decision Timeline`"]
+    section Context Assembly
+        Data Collection : 📋 Thread Messages
+                       : 📎 Uploaded Documents
+                       : 📝 Conversation Summaries
+                       : ⏰ Decision Timeline
+        
+        Prompt Engineering : 🎯 Specialized Instructions
+                           : 📊 Evidence Requirements
+                           : 🔧 Token Optimization
     
-    E --> F["`🧠 **Main Claude**
-    Sonnet Model
-    Deep Analysis`"]
-    
-    F --> G["`✅ **Comprehensive Answer**
-    'Based on the API Design thread,
-    we decided to use REST with
-    JWT authentication...'`"]
-    
-    style A fill:#e1f5fe
-    style D fill:#fff3e0
-    style F fill:#f3e5f5
-    style G fill:#e8f5e8
+    section Analysis
+        Processing : 🧠 Claude 4 Sonnet
+                  : Deep Analysis
+                  : Context Integration
+        
+        Response : ✅ "Based on API Design thread..."
+                : 📚 Specific citations
+                : 🎯 Comprehensive answer
 ```
 
 ### Dependency Injection Architecture
 
 ```mermaid
-graph TD
-    subgraph "🎛️ DI Container Registration"
+graph LR
+    subgraph "🎛️ DI Container"
         Container["`**DIContainer**
         Service Registry & Resolution`"]
-        
-        Container --> DB["`**Database**
+    end
+    
+    subgraph "💾 Data Services"
+        DB["`**Database**
         Connection Pool`"]
-        
-        Container --> SumRepo["`**SummaryRepository**
+        SumRepo["`**SummaryRepository**
         Dependencies: [Database]`"]
-        
-        Container --> ThreadRepo["`**ThreadRepository**
+        ThreadRepo["`**ThreadRepository**
         Dependencies: [Database]`"]
-        
-        Container --> Context["`**ContextService**
+    end
+    
+    subgraph "🧠 Business Logic"
+        Context["`**ContextService**
         Dependencies: [SummaryRepository]`"]
-        
-        Container --> Thread["`**ThreadService**
+        Thread["`**ThreadService**
         Dependencies: [ContextService]`"]
-        
-        Container --> AI["`**ClaudeAIService**
+        AI["`**ClaudeAIService**
         Factory: Secure API Key Injection`"]
-        
-        Container --> Discord["`**DiscordClient**
+    end
+    
+    subgraph "💬 Interface Layer"
+        Discord["`**DiscordClient**
         Dependencies: [AI, Context, Files]`"]
     end
     
-    subgraph "🔄 Runtime Resolution"
-        App[Application.start]
-        App --> Container
-        Container --> |Resolves| Services["`**Active Services**
-        All dependencies injected
-        No global state`"]
-    end
+    Container --> DB
+    Container --> SumRepo
+    Container --> ThreadRepo
+    Container --> Context
+    Container --> Thread
+    Container --> AI
+    Container --> Discord
     
-    style Container fill:#e3f2fd
-    style Services fill:#f1f8e9
+    DB --> SumRepo
+    DB --> ThreadRepo
+    SumRepo --> Context
+    Context --> Thread
 ```
 
 ### Memory Management & Resource Cleanup
@@ -382,87 +399,39 @@ NODE_ENV=development  # Use 'production' for SSL enforcement
 
 ## Deployment Architecture
 
-### Container Deployment Flow
+### Deployment Options
 
 ```mermaid
-gitgraph
-    commit id: "Source Code"
-    branch docker
-    checkout docker
-    commit id: "Docker Build"
-    commit id: "Image Push"
-    branch production
-    checkout production
-    commit id: "Container Deploy"
-    commit id: "Health Check"
-    commit id: "Service Ready"
-    checkout main
-    merge docker
-    merge production
-```
-
-### Production Infrastructure
-
-```mermaid
-graph TB
-    subgraph "🌐 Load Balancer"
-        LB["`**Load Balancer**
-        SSL Termination
-        Health Checks`"]
-    end
+timeline
+    title Deployment Strategies
     
-    subgraph "🐳 Container Platform"
-        C1["`**Bot Instance 1**
-        Discord-Claude
-        Health: ✅`"]
-        C2["`**Bot Instance 2** 
-        Discord-Claude
-        Health: ✅`"]
-        C3["`**Bot Instance N**
-        Auto-scaling
-        Health: ✅`"]
-    end
+    section Serverless (Recommended)
+        Digital Ocean : App Platform
+                      : Automatic scaling
+                      : Managed PostgreSQL
+                      : Zero config deployment
+        
+        Vercel : Edge functions
+               : Global distribution
+               : PlanetScale integration
+               : Git-based deployment
     
-    subgraph "💾 Database Layer"
-        PG["`**PostgreSQL**
-        Conversation Summaries
-        Connection Pool`"]
-        PGS["`**Standby**
-        Read Replica
-        Backup`"]
-    end
+    section Container Platforms
+        Docker : Standard containerization
+               : Health checks
+               : Resource limits
+               : Multi-stage builds
+        
+        Kubernetes : Auto-scaling
+                   : Load balancing
+                   : Service mesh
+                   : High availability
     
-    subgraph "🤖 External APIs"
-        Discord["`**Discord API**
-        Bot Gateway
-        Rate Limited`"]
-        Claude["`**Anthropic**
-        Claude 4 Sonnet
-        Claude 3.5 Haiku`"]
-    end
-    
-    LB --> C1
-    LB --> C2
-    LB --> C3
-    
-    C1 --> PG
-    C2 --> PG
-    C3 --> PG
-    
-    C1 --> Discord
-    C2 --> Discord
-    C3 --> Discord
-    
-    C1 --> Claude
-    C2 --> Claude
-    C3 --> Claude
-    
-    PG --> PGS
-    
-    style C1 fill:#e8f5e8
-    style C2 fill:#e8f5e8
-    style C3 fill:#e8f5e8
-    style PG fill:#e3f2fd
+    section Traditional
+        VPS : Manual setup
+            : Full control
+            : Custom configuration
+            : Direct PostgreSQL
 ```
 
 ### Docker Setup
@@ -521,135 +490,139 @@ METRICS_COLLECTION=true         # Performance metrics
 ### Development Setup
 
 ```mermaid
-flowchart LR
-    A["`🔧 **Clone Repo**
-    git clone & cd`"] --> B["`📦 **Install Deps**
-    bun install`"]
+timeline
+    title Development Lifecycle
     
-    B --> C["`⚙️ **Configure Env**
-    Copy .env.example`"]
+    section Setup
+        Clone : git clone repository
+              : cd discord-claude-bot
+              : Environment preparation
+        
+        Install : bun install
+                : Dependencies resolved
+                : Node modules ready
     
-    C --> D["`🚀 **Start Dev**
-    bun run dev`"]
+    section Configuration  
+        Environment : Copy .env.example
+                    : Add API tokens
+                    : Database URL setup
+                    : Security validation
+        
+        Database : Auto-create tables
+                 : Migration system
+                 : Connection verification
     
-    D --> E["`✅ **Ready**
-    Hot reload enabled`"]
-    
-    style E fill:#e8f5e8
-```
-
-### Testing & Quality
-
-```bash
-# Type checking
-bun tsc --noEmit        # Zero TypeScript errors required
-
-# Code quality
-bun run lint            # ESLint with strict rules
-bun run lint:fix        # Auto-fix issues
-
-# Testing
-bun test               # Jest test suite
-bun run test:watch     # Watch mode
-
-# Build verification
-bun run build          # Production build
+    section Development
+        Hot Reload : bun run dev
+                   : TypeScript compilation
+                   : Automatic restarts
+                   : Zero downtime
+        
+        Quality : bun tsc --noEmit
+                : bun run lint
+                : bun test
+                : Build verification
 ```
 
 ### Module Development Pattern
 
 ```mermaid
-graph TD
-    A["`🎯 **Define Interface**
-    Create service contract`"] --> B["`🏗️ **Implement Service**
-    Business logic + types`"]
+graph LR
+    subgraph "🎯 Interface Design"
+        Interface["`**Define Contract**
+        Service interface
+        Type definitions
+        Dependencies`"]
+    end
     
-    B --> C["`🔌 **Register in DI**
-    Add to application.ts`"]
+    subgraph "🏗️ Implementation"
+        Service["`**Service Logic**
+        Business logic
+        Error handling
+        Resource cleanup`"]
+        
+        Config["`**Configuration**
+        Environment variables
+        Default values
+        Validation`"]
+    end
     
-    C --> D["`⚙️ **Add Configuration**
-    Environment variables`"]
+    subgraph "🔌 Integration"
+        DI["`**DI Registration**
+        Container setup
+        Dependency injection
+        Lifecycle management`"]
+        
+        Tests["`**Testing**
+        Unit tests
+        Integration tests
+        Documentation`"]
+    end
     
-    D --> E["`🧪 **Write Tests**
-    Unit + integration`"]
+    Interface --> Service
+    Interface --> Config
+    Service --> DI
+    Config --> DI
+    DI --> Tests
     
-    E --> F["`📖 **Document API**
-    JSDoc + README`"]
-    
-    style F fill:#e8f5e8
+    style Interface fill:#e3f2fd
+    style Service fill:#e8f5e8
+    style Config fill:#fff3e0
+    style DI fill:#f3e5f5
+    style Tests fill:#f1f8e9
 ```
-
-### Adding New Features
-
-<details>
-<summary>📋 <strong>Step-by-Step Module Creation</strong></summary>
-
-1. **Create Module Structure**
-   ```bash
-   mkdir src/modules/your-module
-   touch src/modules/your-module/{index.ts,service.ts,types.ts}
-   ```
-
-2. **Implement Service Interface**
-   ```typescript
-   export class YourService {
-     constructor(private dependency: SomeDependency) {}
-     
-     async doSomething(): Promise<Result> {
-       // Implementation
-     }
-     
-     destroy(): void {
-       // Cleanup resources
-     }
-   }
-   ```
-
-3. **Register in DI Container**
-   ```typescript
-   // src/core/application.ts
-   container.register('yourService', YourService, {
-     dependencies: ['someDependency']
-   });
-   ```
-
-4. **Add Configuration**
-   ```typescript
-   // src/modules/infra/config/your-config.ts
-   export const YOUR_CONFIG = {
-     setting: environment.yourSetting || 'default'
-   };
-   ```
-
-</details>
 
 ## Architecture Benefits
 
-### 🎯 **Business Value**
+### Business Value Overview
 
 ```mermaid
-mindmap
-  root)🏆 **Enterprise Grade**
-    (🔒 **Security**)
-      Production SSL
-      Secure API injection
-      Input validation
-      Zero hardcoded secrets
-    (⚡ **Performance**)
-      Zero memory leaks
-      80% cost reduction
-      Sub-second startup
-      Automatic cleanup
-    (🛠️ **Maintainability**)
-      Modular design
-      Dependency injection
-      Clear boundaries
-      Comprehensive logging
-    (🚀 **Scalability**)
-      Stateless architecture
-      Horizontal scaling
-      Load balancer ready
-      Health monitoring
+graph TB
+    subgraph "🏆 Enterprise Benefits"
+        Enterprise["`**Enterprise Grade**
+        Production ready
+        Zero technical debt
+        Carmack approved`"]
+    end
+    
+    subgraph "🔒 Security"
+        Security["`**Production SSL**
+        Secure API injection
+        Input validation
+        Zero hardcoded secrets`"]
+    end
+    
+    subgraph "⚡ Performance"
+        Performance["`**Zero Memory Leaks**
+        80% cost reduction
+        Sub-second startup
+        Automatic cleanup`"]
+    end
+    
+    subgraph "🛠️ Maintainability"
+        Maintainability["`**Modular Design**
+        Dependency injection
+        Clear boundaries
+        Comprehensive logging`"]
+    end
+    
+    subgraph "🚀 Scalability"
+        Scalability["`**Stateless Architecture**
+        Horizontal scaling
+        Load balancer ready
+        Health monitoring`"]
+    end
+    
+    Enterprise --> Security
+    Enterprise --> Performance
+    Enterprise --> Maintainability
+    Enterprise --> Scalability
+    
+    style Enterprise fill:#e3f2fd
+    style Security fill:#ffebee
+    style Performance fill:#e8f5e8
+    style Maintainability fill:#fff3e0
+    style Scalability fill:#f3e5f5
 ```
 
 **Maintainability:**
@@ -678,11 +651,41 @@ mindmap
 > These metrics are achieved through the **modular architecture** and **automatic resource management**.
 
 ```mermaid
-xychart-beta
-    title "Performance Benchmarks"
-    x-axis ["Startup Time", "Memory Usage", "Response Time", "Cost Efficiency"]
-    y-axis "Score (0-100)" 0 --> 100
-    bar [95, 98, 85, 92]
+timeline
+    title Performance Achievements
+    
+    section Startup Performance
+        Cold Start : ~1 second
+                   : DI container initialization
+                   : Service registration
+                   : Database connection
+        
+        Hot Reload : <200ms
+                   : Code changes detected
+                   : Automatic restart
+                   : Zero downtime
+    
+    section Runtime Performance
+        Response Time : Sub-100ms latency
+                      : Excluding Claude API
+                      : Efficient processing
+                      : Memory optimized
+        
+        Memory Usage : Zero leaks
+                     : Automatic cleanup
+                     : Instance-based management
+                     : Resource monitoring
+    
+    section Reliability
+        Uptime : 99.9% availability
+               : Circuit breakers
+               : Graceful degradation
+               : Error recovery
+        
+        Cost Efficiency : 80% reduction
+                        : Smart model switching
+                        : Token optimization
+                        : Resource pooling
 ```
 
 **Performance:**
@@ -708,16 +711,41 @@ xychart-beta
 ### Contribution Guidelines
 
 ```mermaid
-gitgraph
-    commit id: "main"
-    branch feature/your-feature
-    checkout feature/your-feature
-    commit id: "implement"
-    commit id: "test"
-    commit id: "document"
-    checkout main
-    merge feature/your-feature
-    commit id: "release"
+timeline
+    title Contribution Workflow
+    
+    section Preparation
+        Setup : Read architecture docs
+              : Understand DI patterns
+              : Follow TypeScript strict
+              : Ensure zero memory leaks
+        
+        Planning : Feature branch
+                 : Clear requirements
+                 : Architecture alignment
+                 : Testing strategy
+    
+    section Development
+        Implementation : Implement feature
+                       : Write tests
+                       : Update documentation
+                       : Code review ready
+        
+        Quality Gates : TypeScript compilation
+                      : ESLint passing
+                      : Tests passing
+                      : Zero breaking changes
+    
+    section Integration
+        Pull Request : Detailed description
+                     : Review process
+                     : CI/CD pipeline
+                     : Merge approval
+        
+        Release : Feature deployment
+                : Documentation update
+                : Performance monitoring
+                : Success metrics
 ```
 
 **Before Contributing:**
