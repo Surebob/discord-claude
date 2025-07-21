@@ -13,6 +13,7 @@ import { MessageSplitter } from '../modules/discord/formatters/message-splitter'
 import { ContextService } from '../modules/data/context-service';
 import { ThreadService } from '../modules/data/thread-service';
 import { ClaudeAIService } from '../modules/ai/claude-service';
+import { metricsEndpoint, metricsCollector } from '../modules/infra/monitoring';
 
 /**
  * Application Orchestrator
@@ -90,6 +91,13 @@ export class Application {
       // Set Discord client for thread service  
       threadService.setDiscordClient(discordClient.client);
       
+      // Start metrics collection if enabled
+      if (process.env.METRICS_COLLECTION === 'true') {
+        metricsCollector.startPeriodicCollection();
+        metricsEndpoint.start();
+        logger.info('📊 Metrics collection and endpoint enabled');
+      }
+      
       this.isStarted = true;
       logger.info('✅ Application started successfully');
 
@@ -113,6 +121,11 @@ export class Application {
 
     try {
       startupLogger.shutdown(config.botName);
+
+      // Stop metrics endpoint if running
+      if (process.env.METRICS_COLLECTION === 'true') {
+        metricsEndpoint.stop();
+      }
 
       // Stop Discord client using DI container
       const discordClient = await container.resolve<DiscordClient>('discordClient');
@@ -140,6 +153,11 @@ export class Application {
     }
 
     try {
+      // Stop metrics endpoint if running
+      if (process.env.METRICS_COLLECTION === 'true') {
+        metricsEndpoint.stop();
+      }
+
       // Graceful shutdown using DI container
       const discordClient = await container.resolve<DiscordClient>('discordClient');
       await discordClient.shutdown();

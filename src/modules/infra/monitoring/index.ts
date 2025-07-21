@@ -52,4 +52,10 @@ export {
   type AlertCondition,
   type AlertEvent,
   type AlertHandler
-} from './alert-manager'; 
+} from './alert-manager';
+
+// Export metrics endpoint
+export {
+  MetricsEndpoint,
+  metricsEndpoint
+} from './metrics-endpoint'; 

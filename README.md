@@ -378,7 +378,26 @@ MAX_TOKENS_PER_REQUEST=128000
 NODE_ENV=development  # Use 'production' for SSL enforcement
 ```
 
-## Deployment Architecture
+## 🚀 Deployment Options
+
+### Development
+```bash
+bun run dev          # Hot reload development
+```
+
+### Production
+```bash
+bun run build        # Optimized build
+bun start           # Production server
+```
+
+## 📈 Scalability
+
+### Architecture Benefits
+- Stateless design principles
+- Clean separation of concerns
+- Modular architecture for easy extension
+- Database-ready structure for persistence
 
 ### Deployment Options
 
@@ -386,7 +405,7 @@ NODE_ENV=development  # Use 'production' for SSL enforcement
 timeline
     title Deployment Strategies
     
-    section Serverless (Recommended)
+    section Cloud Platforms
         Digital Ocean : App Platform
                       : Automatic scaling
                       : Managed PostgreSQL
@@ -394,50 +413,19 @@ timeline
         
         Vercel : Edge functions
                : Global distribution
-               : PlanetScale integration
+               : Database integration
                : Git-based deployment
-    
-    section Container Platforms
-        Docker : Standard containerization
-               : Health checks
-               : Resource limits
-               : Multi-stage builds
-        
-        Kubernetes : Auto-scaling
-                   : Load balancing
-                   : Service mesh
-                   : High availability
     
     section Traditional
         VPS : Manual setup
             : Full control
             : Custom configuration
             : Direct PostgreSQL
-```
-
-### Docker Setup
-
-```dockerfile
-FROM oven/bun:1-alpine
-WORKDIR /app
-
-# Install dependencies
-COPY package.json bun.lockb ./
-RUN bun install --production
-
-# Copy built application
-COPY dist/ ./dist/
-
-# Health check endpoint
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s \
-  CMD curl -f http://localhost:3000/health || exit 1
-
-# Non-root user for security
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S discord-claude -u 1001
-USER discord-claude
-
-CMD ["bun", "start"]
+            
+        Systemd : Linux service management
+                : Auto-restart on failure
+                : System integration
+                : Resource limits
 ```
 
 ### Production Configuration
@@ -561,5 +549,5 @@ timeline
 
 **Maintainability:**
 - Modular design enables independent development and maintenance
-- Dependency injection makes services easily mockable
+- Dependency injection makes services easily extensible
 - Clear separation of concerns reduces coupling
