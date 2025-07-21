@@ -10,71 +10,40 @@ Enterprise-grade Discord bot with **modular architecture**, **zero memory leaks*
 ### Module Structure
 
 ```mermaid
-graph TB
-    subgraph "🏗️ Core Application"
-        Core["`**Core**
-        - DI Container
-        - Application Orchestrator
-        - Lifecycle Management`"]
-    end
+timeline
+    title Modular Architecture Design
     
-    subgraph "🧠 Business Logic Modules"
-        AI["`**AI Module**
-        - Claude API Integration
-        - Tool Handling
-        - Delegation System
-        - Circuit Breakers`"]
+    section Core Foundation
+        Application : 🏗️ DI Container
+                    : Application Orchestrator
+                    : Lifecycle Management
+                    : Service Registry
         
-        Data["`**Data Module**
-        - PostgreSQL Management
-        - Repository Pattern
-        - Context Building
-        - Thread Service`"]
+        Infrastructure : ⚡ Logging & Monitoring
+                       : Configuration Management
+                       : Rate Limiting
+                       : Health Checks
+    
+    section Business Logic
+        AI Services : 🧠 Claude API Integration
+                    : Tool Handling System
+                    : Delegation & Circuit Breakers
+                    : Smart Model Switching
         
-        Discord["`**Discord Module**
-        - Event Handlers
-        - Message Processing
-        - User Interaction
-        - Formatters`"]
+        Data Management : 💾 PostgreSQL Integration
+                        : Repository Pattern
+                        : Context Building
+                        : Thread Service
         
-        Files["`**Files Module**
-        - Multimodal Processing
-        - PDF/Image Analysis
-        - Attachment Manager
-        - Deduplication`"]
-    end
-    
-    subgraph "⚡ Infrastructure"
-        Infra["`**Infrastructure**
-        - Logging & Monitoring
-        - Configuration
-        - Rate Limiting
-        - Health Checks
-        - Error Handling`"]
-    end
-    
-    Core --> AI
-    Core --> Data
-    Core --> Discord
-    Core --> Files
-    
-    AI --> Data
-    AI --> Files
-    Discord --> AI
-    Discord --> Files
-    Discord --> Data
-    
-    AI --> Infra
-    Data --> Infra
-    Discord --> Infra
-    Files --> Infra
-    
-    style Core fill:#e3f2fd
-    style AI fill:#f3e5f5
-    style Data fill:#e8f5e8
-    style Discord fill:#fff3e0
-    style Files fill:#f1f8e9
-    style Infra fill:#fce4ec
+        Discord Interface : 💬 Event Handlers
+                          : Message Processing
+                          : User Interaction
+                          : Response Formatting
+        
+        File Processing : 📎 Multimodal Support
+                        : PDF & Image Analysis
+                        : Attachment Management
+                        : Content Deduplication
 ```
 
 **Key Principles:**
@@ -322,29 +291,41 @@ graph LR
 
 ```mermaid
 graph LR
-    A["`✅ **Prerequisites**
-    Check all requirements`"] --> B{"`💾 **PostgreSQL**
-    Database available?`"}
+    subgraph "📋 Requirements"
+        Prereq["`**Prerequisites**
+        Check all requirements`"]
+    end
     
-    B -->|Yes| C{"`🤖 **Discord Bot**
-    Token configured?`"}
-    B -->|No| B1["`🚨 **Setup Required**
-    Install PostgreSQL`"]
+    subgraph "💾 Database"
+        PG["`**PostgreSQL**
+        Local or cloud service
+        Connection required`"]
+    end
     
-    C -->|Yes| D{"`🧠 **Anthropic API**
-    Key available?`"}
-    C -->|No| C1["`🚨 **Setup Required**
-    Create Discord App`"]
+    subgraph "🤖 Discord Setup"
+        Discord["`**Bot Token**
+        Discord Developer Portal
+        Application configured`"]
+    end
     
-    D -->|Yes| E["`🚀 **Ready to Install**
-    All prerequisites met`"]
-    D -->|No| D1["`🚨 **Setup Required**
-    Get Anthropic API Key`"]
+    subgraph "🧠 AI Service"
+        Anthropic["`**API Key**
+        Anthropic Console
+        Claude access`"]
+    end
     
-    style E fill:#e8f5e8
-    style B1 fill:#ffebee
-    style C1 fill:#ffebee
-    style D1 fill:#ffebee
+    subgraph "🚀 Ready"
+        Ready["`**Installation Ready**
+        All prerequisites met
+        Begin setup`"]
+    end
+    
+    Prereq --> PG
+    Prereq --> Discord
+    Prereq --> Anthropic
+    PG --> Ready
+    Discord --> Ready
+    Anthropic --> Ready
 ```
 
 - **Bun 1.0+**: [Install Bun](https://bun.sh/docs/installation)
